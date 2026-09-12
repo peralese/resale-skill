@@ -44,17 +44,48 @@ Project entries already exist at `.claude/skills/<name>` as relative symlinks to
 Attach appropriate item photographs when running each prompt:
 
 1. `Investigation: Asking price is $15. I may resell it or keep it. Photos attached.` Expected: investigation even if the photo shows a book; confidence, linked comparables, conditional economics and purchase ceiling; no full listing.
-2. `Sell book: Purchase price was $5. Condition is Very Good. Photos attached.` Expected: exact-edition checks, evidence-based condition, three-marketplace comparison, Amazon limitations and one recommended-platform listing.
+2. `Sell book: Purchase price was $5. Condition is Very Good. Photos attached.` Expected: exact-edition checks, evidence-based condition, three-marketplace comparison, Amazon limitations, a primary venue, list-price/format/Best Offer strategy, offer floor and walk-away guidance, and one buyer-facing listing with seller advice separated.
 3. `Sell item: Purchase price was $20. Condition appears excellent. Photos attached.` Use a non-book. Expected: eBay strategy, supported condition, net/profit, title at most 80 characters and appropriate packing.
 
 Useful variations: omit acquisition cost (continue research, withhold profit); include a hidden accepted-offer comparable (final price unknown); show damage despite “excellent” (explain and disclose); omit copyright page (request the specific evidence, do not infer first edition).
+
+### Book-listing boundary example
+
+Synthetic writing-only regression case; the following book details are invented test inputs, not market evidence. Input: `Sell book: Purchase price $5. Exterior Very Good. Supplied cover/spine evidence reads Garden Notes, Alex Reed, hardcover, with light shelf wear. No interior, copyright-page or jacket evidence. Draft the listing using only these facts.`
+
+Expected: omit ISBN, publication year, edition/printing, signed status, jacket status and interior claims. Keep any verification checks outside section 10. In a full Sell response, retain the three-marketplace comparison and practical pricing/offer guidance; this excerpt tests only the listing boundary.
+
+```markdown
+### 10. Ready-to-use listing
+
+**Title:** Garden Notes by Alex Reed Hardcover
+
+**Condition:** Pre-owned hardcover with light shelf wear to the exterior.
+
+**Description:** Garden Notes by Alex Reed in hardcover. The exterior shows light shelf wear. Please review the photographs closely for condition details.
+
+**Item specifics:**
+- Author: Alex Reed
+- Title: Garden Notes
+- Format: Hardcover
+
+### Seller Verification Needed
+
+Check the interior for writing, highlighting, stains, missing pages and ownership marks before publication. Provide the title and copyright pages to establish publication and edition details.
+
+### Shipping recommendation
+
+Measure and weigh the packed book before quoting postage; use rigid packaging and protect the corners.
+```
+
+Acceptance checks: section 10 contains none of `if confirmed`, `should be confirmed before listing`, `verify before listing`, `seller should check`, `interior condition should be confirmed`, `TODO` or placeholders. Its title is at most 80 characters. Unknown specifics are omitted and known wear is disclosed. Seller verification and shipping are separate peer sections. Negative cases such as `First edition, if confirmed` or `Interior condition should be confirmed before listing` inside section 10 must fail this check; omit the claim or move the verification task outside the listing. This example and the skill's final review rule guard the boundary; they do not guarantee every future model response will comply.
 
 ## Validation
 
 Run from the project root using the available system validator (Python 3 and PyYAML required):
 
 ```bash
-for skill in skills/*; do
+for skill in skills/*/; do
   python3 /home/peralese/.codex/skills/.system/skill-creator/scripts/quick_validate.py "$skill" || exit 1
 done
 ```
